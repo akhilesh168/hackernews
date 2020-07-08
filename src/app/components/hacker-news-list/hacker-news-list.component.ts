@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { unionBy } from 'lodash';
 import { Observable, of, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -9,7 +9,7 @@ import { FacadeService } from 'src/app/services/facade/facade.service';
   templateUrl: './hacker-news-list.component.html',
   styleUrls: ['./hacker-news-list.component.scss'],
 })
-export class HackerNewsListComponent implements OnInit {
+export class HackerNewsListComponent implements OnInit, OnDestroy {
   hackerNews$: Observable<Hit[]>;
   private subscription = new Subscription();
   previousPage = 1;
@@ -31,6 +31,15 @@ export class HackerNewsListComponent implements OnInit {
     this.dataUpdate();
     this.initializeChart();
   }
+  ngOnDestroy() {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+  }
+  /*
+  /* update the ui from filtering data of upVotes and hidden array
+  @param
+  */
   private dataUpdate() {
     this.upVotesArray = JSON.parse(
       this.hackerNewsFacade.getItemFromLocalStorage('upVotes')
@@ -55,9 +64,8 @@ export class HackerNewsListComponent implements OnInit {
       this.hackerNews$
         .pipe(
           map((items) => {
-            const y = unionBy(this.upVotesArray, items, 'objectID');
-
-            const filterArray = y.filter(
+            const unionArray = unionBy(this.upVotesArray, items, 'objectID');
+            const filterArray = unionArray.filter(
               (hitItems) =>
                 !array.find((hit) => hitItems.objectID === hit.objectID)
             );
@@ -158,32 +166,52 @@ export class HackerNewsListComponent implements OnInit {
         })
     );
   }
+  /*
+  /* navigate to previous page
+  @param
+  */
   previous() {
     if (this.nextPage > 1) {
       this.nextPage--;
       this.previousPage = this.nextPage;
     }
+    this.getHackerNewsResponse(this.previousPage);
+  }
+
+  /*
+  /* return the facade response based on the pageNumber
+  @param pageNumber
+  */
+  getHackerNewsResponse(pageNumber) {
     this.hackerNews$ = this.hackerNewsFacade
-      .getHackerNews(this.previousPage)
+      .getHackerNews(pageNumber)
       .pipe(map((item) => item.hits));
     this.dataUpdate();
     this.initializeChart();
   }
+  /*
+  /* navigate to next page
+  @param
+  */
   next() {
     if (this.nextPage < 50) {
       this.nextPage = this.nextPage + 1;
     }
-    this.hackerNews$ = this.hackerNewsFacade
-      .getHackerNews(this.nextPage)
-      .pipe(map((item) => item.hits));
-    this.initializeChart();
-    this.dataUpdate();
+    this.getHackerNewsResponse(this.nextPage);
   }
+  /*
+  /* redirect page to given url
+  @param
+  */
   redirectToPageUrl(url: string) {
     if (url) {
       window.open(url, 'blank');
     }
   }
+  /*
+  /* hides the item from news feed
+  @param
+  */
   removeItem(hit: Hit) {
     let removedArray = [];
     let arrayAfterRemovedItem = [];

@@ -1,9 +1,6 @@
-<table
-  class="table table-striped"
-  style="background-color: rgb(246, 246, 239);"
->
+<table class="table table-striped">
   <thead>
-    <tr style="background: #ff6307; color: white; line-height: 1em;">
+    <tr>
       <th scope="col">#</th>
       <th scope="col">Comments</th>
       <th scope="col">Votes Count</th>
@@ -45,24 +42,12 @@
 <nav aria-label="Page navigation example">
   <ul class="pagination justify-content-end">
     <li class="page-item">
-      <a
-        class="page-link"
-        style="font-weight: bold; color: #ff6307;"
-        href="#"
-        (click)="previous()"
-        >Previous</a
-      >
+      <a class="page-link" href="#" (click)="previous()">Previous</a>
     </li>
     <li class="page-item">
-      <a
-        class="page-link"
-        href="#"
-        style="font-weight: bold; color: #ff6307;"
-        (click)="next()"
-        >Next</a
-      >
+      <a class="page-link" href="#" (click)="next()">Next</a>
     </li>
   </ul>
 </nav>
-<hr style="height: 6px;" width="100%" color="#ff6307" />
+<hr width="100%" color="#ff6307" />
 <p-chart type="line" [data]="chartData"></p-chart>
