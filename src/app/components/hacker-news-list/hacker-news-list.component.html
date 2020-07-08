@@ -1,0 +1,68 @@
+<table
+  class="table table-striped"
+  style="background-color: rgb(246, 246, 239);"
+>
+  <thead>
+    <tr style="background: #ff6307; color: white; line-height: 1em;">
+      <th scope="col">#</th>
+      <th scope="col">Comments</th>
+      <th scope="col">Votes Count</th>
+      <th scope="col">UpVotes</th>
+      <th scope="col">News Detail</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let hit of hackerNews$ | async; index as i">
+      <th scope="row">{{ i + 1 }}</th>
+      <td>
+        {{ hit.num_comments ? hit.num_comments : '-' }}
+      </td>
+      <td>
+        {{ hit.points }}
+      </td>
+      <td>
+        <i
+          (click)="increaseUpVotes(hit)"
+          class="material-icons align-arrow-right"
+          style="cursor: pointer;"
+          >arrow_drop_up</i
+        >
+      </td>
+      <td>
+        {{ hit.story_title }}
+        <a class="" href="#" (click)="redirectToPageUrl(hit.story_url)">
+          ({{ hit.story_url }})
+        </a>
+        <span
+          >by {{ hit.author }} {{ hit.created_at_i | date: 'H' }} hours ago
+          <a class="" href="#" (click)="removeItem(hit)">[hide]</a>
+        </span>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<nav aria-label="Page navigation example">
+  <ul class="pagination justify-content-end">
+    <li class="page-item">
+      <a
+        class="page-link"
+        style="font-weight: bold; color: #ff6307;"
+        href="#"
+        (click)="previous()"
+        >Previous</a
+      >
+    </li>
+    <li class="page-item">
+      <a
+        class="page-link"
+        href="#"
+        style="font-weight: bold; color: #ff6307;"
+        (click)="next()"
+        >Next</a
+      >
+    </li>
+  </ul>
+</nav>
+<hr style="height: 6px;" width="100%" color="#ff6307" />
+<p-chart type="line" [data]="chartData"></p-chart>
