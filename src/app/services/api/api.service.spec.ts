@@ -8,7 +8,7 @@ import { HackerNews } from 'src/app/model/comments.model';
 import { commentsApiMockResponse } from 'src/assets/mock-data/mock-data';
 import { ApiService } from './api.service';
 
-describe('ApiService', () => {
+fdescribe('ApiService', () => {
   let service: ApiService;
   let httpTestingController: HttpTestingController;
   let subscription = new Subscription();

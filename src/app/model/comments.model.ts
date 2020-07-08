@@ -35,12 +35,12 @@ export interface Url {
 }
 
 export interface HighlightResult {
-  author: Author;
-  comment_text: CommentText;
-  story_title: StoryTitle;
-  story_url: StoryUrl;
-  title: Title;
-  url: Url;
+  author?: Author;
+  comment_text?: CommentText;
+  story_title?: StoryTitle;
+  story_url?: StoryUrl;
+  title?: Title;
+  url?: Url;
 }
 
 export interface Hit {
