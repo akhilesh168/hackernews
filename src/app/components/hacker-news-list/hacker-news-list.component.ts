@@ -17,6 +17,7 @@ export class HackerNewsListComponent implements OnInit, OnDestroy {
   chartData: any;
   private hitArray: Hit[] = [];
   upVotesArray = [];
+  currentPage = 1;
   private hiddenArray = [];
 
   constructor(
@@ -25,8 +26,12 @@ export class HackerNewsListComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    const currentPageNumber = JSON.parse(
+      this.hackerNewsFacade.getItemFromLocalStorage('bookmarkPage')
+    );
+    this.currentPage = currentPageNumber ? currentPageNumber : this.currentPage;
     this.hackerNews$ = this.hackerNewsFacade
-      .getHackerNews(1)
+      .getHackerNews(this.currentPage)
       .pipe(map((items) => items.hits));
     this.dataUpdate();
     this.initializeChart();
@@ -174,6 +179,7 @@ export class HackerNewsListComponent implements OnInit, OnDestroy {
     if (this.nextPage > 1) {
       this.nextPage--;
       this.previousPage = this.nextPage;
+      this.currentPage = this.previousPage;
     }
     this.getHackerNewsResponse(this.previousPage);
   }
@@ -196,6 +202,7 @@ export class HackerNewsListComponent implements OnInit, OnDestroy {
   next() {
     if (this.nextPage < 50) {
       this.nextPage = this.nextPage + 1;
+      this.currentPage = this.nextPage;
     }
     this.getHackerNewsResponse(this.nextPage);
   }
@@ -237,5 +244,11 @@ export class HackerNewsListComponent implements OnInit, OnDestroy {
         );
         this.hackerNews$ = of(arrayAfterRemovedItem);
       });
+  }
+  addToBookmarks() {
+    this.hackerNewsFacade.setItemInLocalStorage(
+      'bookmarkPage',
+      this.currentPage
+    );
   }
 }
