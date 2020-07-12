@@ -54,4 +54,6 @@
   </ul>
 </nav>
 <hr width="100%" color="#ff6307" />
-<p-chart type="line" [data]="chartData"></p-chart>
+<div *ngIf="isBrowser">
+  <p-chart type="line" [data]="chartData"></p-chart>
+</div>

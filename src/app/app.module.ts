@@ -1,12 +1,16 @@
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { NgModule } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
+import { APP_ID, Inject, NgModule, PLATFORM_ID } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import {
+  TransferHttpModule,
+  TransferHttpService,
+} from '@gorniv/ngx-transfer-http';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { TransferHttpCacheModule } from '@nguniversal/common';
 import { ChartModule } from 'primeng/chart';
 import { AppComponent } from './app.component';
 import { HackerNewsListComponent } from './components/hacker-news-list/hacker-news-list.component';
-import { CachingInterceptor } from './services/Interceptor/cache/caching-interceptor.service';
-import { HttpInterceptorService } from './services/Interceptor/http-interceptor.service';
 
 @NgModule({
   declarations: [AppComponent, HackerNewsListComponent],
@@ -15,14 +19,19 @@ import { HttpInterceptorService } from './services/Interceptor/http-interceptor.
     HttpClientModule,
     ChartModule,
     NgbModule,
+    TransferHttpModule,
+    TransferHttpCacheModule,
   ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: HttpInterceptorService,
-      multi: true,
-    },
-    { provide: HTTP_INTERCEPTORS, useClass: CachingInterceptor, multi: true },
-  ],
+  providers: [TransferHttpService],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    @Inject(APP_ID) private appId: string
+  ) {
+    const platform = isPlatformBrowser(platformId)
+      ? 'in the browser'
+      : 'on the server';
+    console.log(`Running ${platform} with appId=${appId}`);
+  }
+}

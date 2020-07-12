@@ -1,4 +1,11 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import {
+  Component,
+  Inject,
+  OnDestroy,
+  OnInit,
+  PLATFORM_ID,
+} from '@angular/core';
 import { unionBy } from 'lodash';
 import { Observable, of, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -19,11 +26,13 @@ export class HackerNewsListComponent implements OnInit, OnDestroy {
   upVotesArray = [];
   currentPage = 1;
   private hiddenArray = [];
-
+  isBrowser: boolean;
   constructor(
     private hackerNewsFacade: FacadeService,
-    private cd: ChangeDetectorRef
-  ) {}
+    @Inject(PLATFORM_ID) platformId: Object
+  ) {
+    this.isBrowser = isPlatformBrowser(platformId);
+  }
 
   ngOnInit(): void {
     const currentPageNumber = JSON.parse(

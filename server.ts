@@ -1,46 +1,86 @@
 /***************************************************************************************************
  * Load `$localize` onto the global scope - used if i18n tags appear in Angular templates.
  */
-import { APP_BASE_HREF } from "@angular/common";
-import "@angular/localize/init";
-import { ngExpressEngine } from "@nguniversal/express-engine";
-import * as express from "express";
-import { existsSync } from "fs";
-import { join } from "path";
-import "zone.js/dist/zone-node";
-import { AppServerModule } from "./src/main.server";
+import { APP_BASE_HREF } from '@angular/common';
+import '@angular/localize/init';
+import { ngExpressEngine } from '@nguniversal/express-engine';
+import * as express from 'express';
+import { existsSync } from 'fs';
+import 'localstorage-polyfill';
+import { join } from 'path';
+import 'zone.js/dist/zone-node';
+import { AppServerModule } from './src/main.server';
+
+// for debug
+require('source-map-support').install();
+
+// for tests
+const test = process.env['TEST'] === 'true';
+
+// ssr DOM
+const domino = require('domino');
+const fs = require('fs');
+const path = require('path');
+// index from browser build!
+const template = fs
+  .readFileSync(path.join('.', 'dist/hackernews/browser', 'index.html'))
+  .toString();
+// for mock global window by domino
+const win = domino.createWindow(template);
+// from server build
+const files = fs.readdirSync(`${process.cwd()}/dist/hackernews/server`);
+// mock
+global['window'] = win;
+
+// not implemented property and functions
+Object.defineProperty(win.document.body.style, 'transform', {
+  value: () => {
+    return {
+      enumerable: true,
+      configurable: true,
+    };
+  },
+});
+// mock documnet
+global['document'] = win.document;
+// othres mock
+global['CSS'] = null;
+// global['XMLHttpRequest'] = require('xmlhttprequest').XMLHttpRequest;
+global['Prism'] = null;
 
 // The Express app is exported so that it can be used by serverless Functions.
-export function app(): express.Express {
+export function app() {
   const server = express();
-  const distFolder = join(process.cwd(), "dist/hackernews/browser");
-  const indexHtml = existsSync(join(distFolder, "index.original.html"))
-    ? "index.original.html"
-    : "index";
-
+  const distFolder = join(process.cwd(), 'dist/hackernews/browser');
+  const indexHtml = existsSync(join(distFolder, 'index.original.html'))
+    ? 'index.original.html'
+    : 'index';
   // Our Universal express-engine (found @ https://github.com/angular/universal/tree/master/modules/express-engine)
   server.engine(
-    "html",
+    'html',
     ngExpressEngine({
       bootstrap: AppServerModule,
     })
   );
 
-  server.set("view engine", "html");
-  server.set("views", distFolder);
+  server.set('view engine', 'html');
+  server.set('views', distFolder);
 
-  // Example Express Rest API endpoints
-  // server.get('/api/**', (req, res) => { });
+  // TODO: implement data requests securely
+  server.get('/api/**', (req, res) => {
+    res.status(404).send('data requests are not yet supported');
+  });
+
   // Serve static files from /browser
   server.get(
-    "*.*",
+    '*.*',
     express.static(distFolder, {
-      maxAge: "1y",
+      maxAge: '1y',
     })
   );
 
   // All regular routes use the Universal engine
-  server.get("*", (req, res) => {
+  server.get('*', (req, res) => {
     res.render(indexHtml, {
       req,
       providers: [{ provide: APP_BASE_HREF, useValue: req.baseUrl }],
@@ -50,8 +90,8 @@ export function app(): express.Express {
   return server;
 }
 
-function run(): void {
-  const port = process.env.PORT || 4000;
+function run() {
+  const port = process.env.PORT || 4040;
 
   // Start up the Node server
   const server = app();
@@ -65,9 +105,9 @@ function run(): void {
 // The below code is to ensure that the server is run only when not requiring the bundle.
 declare const __non_webpack_require__: NodeRequire;
 const mainModule = __non_webpack_require__.main;
-const moduleFilename = (mainModule && mainModule.filename) || "";
-if (moduleFilename === __filename || moduleFilename.includes("iisnode")) {
+const moduleFilename = (mainModule && mainModule.filename) || '';
+if (moduleFilename === __filename || moduleFilename.includes('iisnode')) {
   run();
 }
 
-export * from "./src/main.server";
+export * from './src/main.server';
