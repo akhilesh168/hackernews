@@ -2,10 +2,6 @@ import { isPlatformBrowser } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { APP_ID, Inject, NgModule, PLATFORM_ID } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import {
-  TransferHttpModule,
-  TransferHttpService,
-} from '@gorniv/ngx-transfer-http';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { TransferHttpCacheModule } from '@nguniversal/common';
 import { ChartModule } from 'primeng/chart';
@@ -19,10 +15,8 @@ import { HackerNewsListComponent } from './components/hacker-news-list/hacker-ne
     HttpClientModule,
     ChartModule,
     NgbModule,
-    TransferHttpModule,
     TransferHttpCacheModule,
   ],
-  providers: [TransferHttpService],
 })
 export class AppModule {
   constructor(

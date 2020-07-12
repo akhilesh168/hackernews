@@ -18,9 +18,17 @@ hr {
 .material-icons {
   display: inline-flex;
   vertical-align: top;
+  cursor: pointer;
+}
+.icon-color {
+  color: #ff6307;
 }
 .bookmark {
   font-size: 24px;
   line-height: 24px;
   cursor: pointer;
+}
+.disabled {
+  pointer-events: none !important;
+  cursor: default !important;
 }
